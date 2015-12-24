@@ -1,84 +1,76 @@
 #!/usr/bin/python
-# Import required libraries
-import sys
-import time
+
 import RPi.GPIO as GPIO
- 
-# Use BCM GPIO references
-# instead of physical pin numbers
-GPIO.setmode(GPIO.BCM)
- 
-# Define GPIO signals to use
-# Physical pins 11,15,16,18
-# GPIO17,GPIO22,GPIO23,GPIO24
-StepPins = [17, 18, 21, 22]
- 
-# Set all pins as output
-for pin in StepPins:
-    print "Setup pins"
-    GPIO.setup(pin,GPIO.OUT)
-    GPIO.output(pin, False)
- 
-# Define advanced sequence
-# as shown in manufacturers datasheet
-Seq = [
-    [1,0,0,1],
-    [1,0,0,0],
-    [1,1,0,0],
-    [0,1,0,0],
-    [0,1,1,0],
-    [0,0,1,0],
-    [0,0,1,1],
-    [0,0,0,1]
-]
-                
-Seq = [
-    [1,0,0,1],
-    [1,1,0,0],
-    [0,1,1,0],
-    [0,0,1,1],
-]
-                
-StepCount = len(Seq)
-StepDir = 1 # Set to 1 or 2 for clockwise
-                        # Set to -1 or -2 for anti-clockwise
- 
-# Read wait time from command line
-if len(sys.argv)>1:
-    WaitTime = int(sys.argv[1])/float(1000)
-else:
-    WaitTime = 10/float(1000)
- 
-# Initialise variables
-StepCounter = 0
- 
-# Start main loop
-while True:
- 
-    print StepCounter,
-    print Seq[StepCounter]
- 
-    for pin in range(0, 4):
-        xpin = StepPins[pin]
-        if Seq[StepCounter][pin]!=0:
-            print " Enable GPIO %i" %(xpin)
-            GPIO.output(xpin, True)
-        else:
-            GPIO.output(xpin, False)
- 
-    StepCounter += StepDir
- 
-    # If we reach the end of the sequence
-    # start again
-    if (StepCounter>=StepCount):
-        StepCounter = 0
-    if (StepCounter<0):
-        StepCounter = StepCount+StepDir
- 
-    # Wait before moving on
-    try:
-        time.sleep(WaitTime)
-    except KeyboardInterrupt:
-        for pin in range(0, 4):
-            GPIO.output(StepPins[pin], False)
-        raise
+import threading
+import time
+
+_STEPS_PER_SQUARE = 40
+_SLEEP_INTERVAL = 4 / 1000.0
+
+
+class MotorDef(object):
+    def __init__(self, pins, motor_id):
+        self.pins = pins
+        self.motor_id = motor_id
+
+
+class MotorMovement(object):
+    def __init__(self, motor_id, reverse, squares):
+        self.motor_id = motor_id
+        self.reverse = reverse
+        self.squares = squares
+
+
+class MotorDriver(object):
+    def __init__(self, motors):
+        GPIO.setwarnings(False)
+        GPIO.setmode(GPIO.BCM)
+        self._motors = {x.motor_id: x for x in motors}
+        for motor in motors:
+            for pin in motor.pins:
+                GPIO.setup(pin, GPIO.OUT)
+                GPIO.output(pin, False)
+
+    def __del__(self):
+        for motor in self._motors.values():
+            for pin in motor.pins:
+                GPIO.output(pin, False)
+
+    def move(self, movements):
+        threads = [threading.Thread(target=self._move, args=[x]) for x in movements]
+        for thread in threads:
+            thread.start()
+
+        for thread in threads:
+            thread.join()
+
+    def _move(self, movement):
+        time.sleep(_SLEEP_INTERVAL)
+        pins = self._motors[movement.motor_id].pins
+        steps = movement.squares * _STEPS_PER_SQUARE
+        movement_sequence = reversed(self._movement_sequence) if movement.reverse else self._movement_sequence
+        pin_vals = [zip(pins, x) for x in movement_sequence]
+        for ignored in range(0, steps):
+            for pin_set in pin_vals:
+                for pin, val in pin_set:
+                    GPIO.output(pin, val != 0)
+                time.sleep(_SLEEP_INTERVAL)
+
+    _movement_sequence = [
+        [1, 0, 0, 1],
+        [1, 1, 0, 0],
+        [0, 1, 1, 0],
+        [0, 0, 1, 1],
+    ]
+
+
+def test():
+    x_motor = MotorDef([17, 18, 21, 22], 'x')
+    driver = MotorDriver([x_motor])
+    driver.move([MotorMovement('x', False, 1)])
+    driver.move([MotorMovement('x', True, 1)])
+
+
+if __name__ == '__main__':
+    test()
+
