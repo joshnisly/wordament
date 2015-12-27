@@ -1,8 +1,19 @@
 #!/usr/bin/python
 
+import sys
+import unittest
+
 import binsearch
 
 GRID_SIZE = 4
+
+
+def load_from_string(letters):
+    return [letters[x*GRID_SIZE:(x+1)*GRID_SIZE] for x in range(0, GRID_SIZE)]
+
+
+def load_list_from_file(path):
+    return [x.strip().lower() for x in open(path).readlines()]
 
 
 def find_words(grid, word_list):
@@ -110,3 +121,16 @@ def _get_all_grid_points():
             points.append((x, y))
     return points
 
+
+class FixesTest(unittest.TestCase):
+    def testDerived(self):
+        matches = self._find('hncrtienvrdahede', ['derived'])
+        self.assertEquals(matches, ['derived'])
+
+    def _find(self, letters, words):
+        results = find_words(load_from_string(letters), words)
+        return [x[0] for x in results]
+
+
+if __name__ == '__main__':
+    unittest.main()
