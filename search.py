@@ -19,7 +19,8 @@ def load_list_from_file(path):
 def find_words(grid, word_list):
     _validate_size(grid)
 
-    results = set()
+    results = []
+    result_words = set()
     possible_starts = _get_all_grid_points()
     snake = (possible_starts.pop(),)
     bad_paths = set()
@@ -33,7 +34,7 @@ def find_words(grid, word_list):
 
             if not snake:
                 if not possible_starts:
-                    return list(results)
+                    return sorted(results)
                 snake = (possible_starts.pop(),)
             continue
 
@@ -42,8 +43,9 @@ def find_words(grid, word_list):
         search_str = _get_grid_chars(snake, grid)
 
         is_word, is_prefix = _check_word(search_str, word_list)
-        if is_word and len(search_str) > 2:
-            results.add((search_str, snake))
+        if is_word and len(search_str) > 2 and not search_str in result_words:
+            results.append((search_str, snake))
+            result_words.add(search_str)
         if not is_prefix:
             bad_paths.add(snake)
             snake = snake[:-1]
@@ -98,6 +100,7 @@ def _get_random_move(snake, bad_snakes):
 
         if cur_pos[0] > 0:
             possibilities.append((cur_pos[0] - 1, cur_pos[1] + 1))  # Northeast
+
     # Don't allow the snake to eat itself
     possibilities = filter(lambda x: not x in snake, possibilities)
 
@@ -123,9 +126,13 @@ def _get_all_grid_points():
 
 
 class FixesTest(unittest.TestCase):
-    def testDerived(self):
+    def testWordDerived(self):
         matches = self._find('hncrtienvrdahede', ['derived'])
         self.assertEquals(matches, ['derived'])
+
+    def testDuplicates(self):
+        matches = self._find('asdfasdfasdfasdf', ['ass', 'sass'])
+        self.assertEquals(matches, ['ass', 'sass'])
 
     def _find(self, letters, words):
         results = find_words(load_from_string(letters), words)
