@@ -1,0 +1,17 @@
+#GridTable
+{
+    border-collapse: collapse;
+    border-spacing: 0;
+}
+
+#GridTable TD
+{
+    margin: 0;
+    border: 1px solid lime;
+    border-collapse: collapse;
+    height: 45px;
+    width: 45px;
+    background-color: lightblue;
+    text-align: center;
+    vertical-align: center;
+}
