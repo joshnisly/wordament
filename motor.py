@@ -65,7 +65,7 @@ class MotorDriver(object):
 
 
 def test():
-    x_motor = MotorDef([17, 18, 21, 22], 'x')
+    x_motor = MotorDef([23, 24, 25, 27], 'x')
     driver = MotorDriver([x_motor])
     driver.move([MotorMovement('x', False, 1)])
     driver.move([MotorMovement('x', True, 1)])

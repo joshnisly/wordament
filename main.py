@@ -4,6 +4,7 @@ import argparse
 import sys
 import unittest
 
+import draw
 import search
 
 
@@ -44,9 +45,11 @@ def main():
 
     results = search.find_words(grid, word_list)
     results.sort(key=lambda x: len(x))
-    print '\n'.join(results)
+    print '\n'.join([x[0] for x in results])
 
     print len(results)
+
+    draw.draw_results(results)
 
 
 class FixesTest(unittest.TestCase):
