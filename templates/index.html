@@ -2,25 +2,31 @@
 <head>
     <title>Wordament solver</title>
 
+    <link rel="stylesheet" href="{% swat_static 'invglobals.css' %}"/>
     <link rel="stylesheet" href="{% static 'index.css' %}"/>
 </head>
 <body>
 
-<div id="GridSection">
-    <table id="GridTable">
-        {% for row in range(0, grid_size) %}
-        <tr>
-            {% for col in range(0, grid_size) %}
-            <td xrow="{{ row }}" xcol="{{ col }}">{{row}}x{{col}}</td>
+<div id="Content">
+    <div id="GridSection">
+        <table id="GridTable">
+            {% for row in range(0, grid_size) %}
+            <tr>
+                {% for col in range(0, grid_size) %}
+                <td xrow="{{ row }}" xcol="{{ col }}"></td>
+                {% endfor %}
+            </tr>
             {% endfor %}
-        </tr>
-        {% endfor %}
-    </table>
+        </table>
+    </div>
+
+    <div id="ResultsSection">
+    </div>
 </div>
 
-<div id="ResultsSection">
-
-</div>
+<script type="text/javascript">
+    var initialGrid = '{{ initial_grid or ''}}';
+</script>
 
 <script type="text/javascript" src="{% swat_static 'jquery-1.6.4.min.js' %}"></script>
 <script type="text/javascript" src="{% swat_static 'invglobals.js' %}"></script>

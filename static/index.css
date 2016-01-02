@@ -1,3 +1,8 @@
+#Content
+{
+    padding: 1em;
+}
+
 #GridTable
 {
     border-collapse: collapse;
@@ -14,4 +19,32 @@
     background-color: lightblue;
     text-align: center;
     vertical-align: center;
+}
+
+#GridTable TD.Selected
+{
+    background-color: red;
+}
+
+.Marker
+{
+    position: absolute;
+    width: 2px;
+    height: 2px;
+    background-color: lime;
+}
+
+#ResultsSection
+{
+    margin-top: 1em;
+}
+
+#ResultsSection .Result
+{
+    cursor: pointer;
+}
+
+#ResultsSection .Result.Selected
+{
+    font-weight: bold;
 }
