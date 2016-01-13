@@ -4,14 +4,15 @@ import RPi.GPIO as GPIO
 import threading
 import time
 
-_STEPS_PER_SQUARE = 40
-_SLEEP_INTERVAL = 4 / 1000.0
+_STEPS_PER_SQUARE = 192
+_SLEEP_INTERVAL = 2 / 1000.0
 
 
 class MotorDef(object):
-    def __init__(self, pins, motor_id):
+    def __init__(self, pins, motor_id, auto_reverse=False):
         self.pins = pins
         self.motor_id = motor_id
+        self.auto_reverse = auto_reverse
 
 
 class MotorMovement(object):
@@ -39,6 +40,7 @@ class MotorDriver(object):
     def move(self, movements):
         threads = [threading.Thread(target=self._move, args=[x]) for x in movements]
         for thread in threads:
+            thread.daemon = True
             thread.start()
 
         for thread in threads:
@@ -47,8 +49,9 @@ class MotorDriver(object):
     def _move(self, movement):
         time.sleep(_SLEEP_INTERVAL)
         pins = self._motors[movement.motor_id].pins
-        steps = movement.squares * _STEPS_PER_SQUARE
-        movement_sequence = reversed(self._movement_sequence) if movement.reverse else self._movement_sequence
+        steps = int(movement.squares * _STEPS_PER_SQUARE)
+        reverse = self._motors[movement.motor_id].auto_reverse != movement.reverse
+        movement_sequence = reversed(self._movement_sequence) if reverse else self._movement_sequence
         pin_vals = [zip(pins, x) for x in movement_sequence]
         for ignored in range(0, steps):
             for pin_set in pin_vals:
@@ -65,10 +68,13 @@ class MotorDriver(object):
 
 
 def test():
-    x_motor = MotorDef([23, 24, 25, 27], 'x')
-    driver = MotorDriver([x_motor])
-    driver.move([MotorMovement('x', False, 1)])
-    driver.move([MotorMovement('x', True, 1)])
+    _X_MOTOR_PINS = [17, 18, 21, 22]
+    _Y_MOTOR_PINS = [23, 24, 25, 27]
+    x_motor = MotorDef(_X_MOTOR_PINS, 'x')
+    y_motor = MotorDef(_Y_MOTOR_PINS, 'y')
+    driver = MotorDriver([x_motor, y_motor])
+    driver.move([MotorMovement('y', True, 4), MotorMovement('x', True, 4)])
+    driver.move([MotorMovement('y', False, 4), MotorMovement('x', False, 4)])
 
 
 if __name__ == '__main__':
