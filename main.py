@@ -26,20 +26,19 @@ def main():
     if args.grid:
         grid = search.load_list_from_file(args.grid)
     else:
-        #grid = search.load_from_string('eerddnawsecloile')
-        grid = search.load_grid_from_input()
+        grid = search.load_from_string('eerddnawsecloile')
+        grid = load_grid_from_input()
 
     word_list = sorted(search.load_list_from_file(args.word_list))
 
     print grid
-    print '\n'.join(grid)
+    #print '\n'.join(grid)
 
     print len(word_list)
 
     results = search.find_words(grid, word_list)
     results.sort(key=lambda x: len(x[0]), reverse=True)
-    print '\n'.join([x[0] for x in results])
-    return
+    #print '\n'.join([x[0] for x in results])
 
     print len(results)
 
