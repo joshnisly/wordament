@@ -11,7 +11,7 @@ _Y_MOTOR_PINS = [23, 24, 25, 27]
 _SERVO_PIN = 7
 
 
-def draw_results(results):
+def draw_results(results, stop_signal=None):
     motors = [
         motor.MotorDef(_X_MOTOR_PINS, 'y'),
         motor.MotorDef(_Y_MOTOR_PINS, 'x', True)
@@ -22,9 +22,12 @@ def draw_results(results):
 
     # Assume that we're starting at 0x0
     cur_pos = [0, 0]
+
     def _draw_word(word):
         print word
         for letter in word[1]:
+            if stop_signal and stop_signal.isSet():
+                return
             _move_to_pos(letter, cur_pos, driver)
             touch_servo.move_down()
         touch_servo.move_up()
@@ -75,6 +78,7 @@ def _move_to_pos(letter, cur_pos, driver):
 def _add_movement(old, new, motor_id, movements):
     if old != new:
         movements.append(motor.MotorMovement(motor_id, old > new, abs(old-new)))
+
 
 class InterimWordTest(unittest.TestCase):
     def testDerived(self):

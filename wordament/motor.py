@@ -1,6 +1,11 @@
 #!/usr/bin/python
 
-import RPi.GPIO as GPIO
+try:
+    import RPi.GPIO as GPIO
+    FAKE_MOTORS = False
+except ImportError:
+    FAKE_MOTORS = True
+
 import threading
 import time
 
@@ -24,6 +29,8 @@ class MotorMovement(object):
 
 class MotorDriver(object):
     def __init__(self, motors):
+        if FAKE_MOTORS:
+            return
         GPIO.setwarnings(False)
         GPIO.setmode(GPIO.BCM)
         self._motors = {x.motor_id: x for x in motors}
@@ -33,11 +40,16 @@ class MotorDriver(object):
                 GPIO.output(pin, False)
 
     def __del__(self):
+        if FAKE_MOTORS:
+            return
         for motor in self._motors.values():
             for pin in motor.pins:
                 GPIO.output(pin, False)
 
     def move(self, movements):
+        if FAKE_MOTORS:
+            time.sleep(1)
+            return
         threads = [threading.Thread(target=self._move, args=[x]) for x in movements]
         for thread in threads:
             thread.daemon = True
