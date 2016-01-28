@@ -5,6 +5,7 @@ import time
 _UP_POS = 43
 _DOWN_POS = 55
 
+
 class Servo(object):
     def __init__(self, pin):
         self._pin = pin
@@ -24,9 +25,13 @@ class Servo(object):
             self._is_up = False
 
     def _write_pos(self, pos):
-        with open('/dev/servoblaster', 'w') as output:
-            command = 'P1-%i=%i%%\n' % (self._pin, pos)
-            output.write(command)
+        try:
+            with open('/dev/servoblaster', 'w') as output:
+                command = 'P1-%i=%i%%\n' % (self._pin, pos)
+                output.write(command)
+        except Exception:
+            pass
+
         time.sleep(0.2)
 
 
