@@ -31,7 +31,7 @@ class Servo(object):
                 output.write(command)
         except Exception:
             pass
-
-        time.sleep(0.2)
+        else:
+            time.sleep(0.15)
 
 
