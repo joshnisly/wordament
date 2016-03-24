@@ -12,6 +12,22 @@ import driver_thread
 import search
 import vision.grid
 
+LETTERS = 'abcdefghijklmnopqrstuvwxyz'
+#SCORES = [2533154420634224 222466 58]
+SCORES = [2, 5, 3, 3, 1, 5, 4, 4, 2, 10, 6, 3, 4, 2, 2, 4, 2, 2, 2, 2, 4, 6, 6, 2, 5, 8]
+LETTER_SCORES = dict(zip(LETTERS, SCORES))
+
+
+def compute_score(word):
+    total = sum([LETTER_SCORES[x] for x in word])
+    if len(word) >= 8:
+        return int(total * 2.5)
+    if len(word) >= 6:
+        return int(total * 2)
+    if len(word) >= 5:
+        return int(total * 1.5)
+    return total
+
 
 def load_grid_from_input():
     '''
@@ -88,7 +104,7 @@ def main():
             grid = load_grid_from_input()
 
         results = search.find_words(grid, word_list)
-        results.sort(key=lambda x: len(x[0]), reverse=True)
+        results.sort(key=lambda x: compute_score(x[0]), reverse=True)
 
         draw.draw_results(results)
     else:
