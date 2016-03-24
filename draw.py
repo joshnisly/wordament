@@ -34,7 +34,7 @@ def draw_results(results, stop_signal=None):
         results.remove(word)
 
     try:
-        while True:
+        while results:
             result = results[0]
 
             interim_word = _find_interim_word(cur_pos, result[1][0], results[1:])
@@ -50,6 +50,7 @@ def draw_results(results, stop_signal=None):
 
 def _find_interim_word(cur_pos, target_pos, words):
     print 'interim:', cur_pos, target_pos
+
     def _calc_dist(a, b):
         return max(abs(a[0] - b[0]), abs(a[1] - b[1]))
 
