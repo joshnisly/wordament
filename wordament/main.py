@@ -31,7 +31,7 @@ def compute_score(word):
 
 def load_grid_from_input():
     '''
-    returns a two-dimensional 5x5 grid
+    returns a two-dimensional 4x4 grid
     '''
     letters = raw_input('Enter grid in one dimension (%i chars)' % search.GRID_SIZE**2)
     letters = letters.lower()
