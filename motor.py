@@ -48,7 +48,6 @@ class MotorDriver(object):
 
     def move(self, movements):
         if FAKE_MOTORS:
-            time.sleep(1)
             return
         threads = [threading.Thread(target=self._move, args=[x]) for x in movements]
         for thread in threads:
