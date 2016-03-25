@@ -26,7 +26,7 @@ def compute_score(word):
         return int(total * 2)
     if len(word) >= 5:
         return int(total * 1.5)
-    return total
+    return total / float(len(word))
 
 
 def load_grid_from_input():
