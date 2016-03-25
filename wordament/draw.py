@@ -13,15 +13,15 @@ _SERVO_PIN = 7
 
 def draw_results(results, stop_signal=None):
     motors = [
-        motor.MotorDef(_X_MOTOR_PINS, 'y'),
-        motor.MotorDef(_Y_MOTOR_PINS, 'x', True)
+        motor.MotorDef(_X_MOTOR_PINS, 'y', 1, True),
+        motor.MotorDef(_Y_MOTOR_PINS, 'x', 2)
     ]
-    driver = motor.MotorDriver(motors)
+    driver = motor.AdaMotorDriver(motors)
     touch_servo = servo.Servo(_SERVO_PIN)
     touch_servo.move_up()
 
     # Assume that we're starting at 0x0
-    cur_pos = [0, 0]
+    cur_pos = [4, 0]
 
     def _draw_word(word):
         print word
@@ -45,7 +45,7 @@ def draw_results(results, stop_signal=None):
 
     finally:
         touch_servo.move_up()
-        _move_to_pos([0, 0], cur_pos, driver)
+        _move_to_pos([4, 0], cur_pos, driver)
 
 
 def _find_interim_word(cur_pos, target_pos, words):
@@ -65,8 +65,6 @@ def _find_interim_word(cur_pos, target_pos, words):
 
 
 def _move_to_pos(letter, cur_pos, driver):
-    print 'Moving from %s -> %s...' % (cur_pos, letter)
-
     movements = []
     # Calculate x-axis movement
     _add_movement(cur_pos[0], letter[0], 'x', movements)
