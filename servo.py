@@ -1,5 +1,6 @@
 #!/usr/bin/python
 
+import sys
 import time
 
 _UP_POS = 43
@@ -34,4 +35,9 @@ class Servo(object):
         else:
             time.sleep(0.15)
 
-
+if __name__ == '__main__':
+    servo = Servo(7)
+    if sys.argv[1].lower() == 'up':
+        servo.move_up()
+    else:
+        servo.move_down()
