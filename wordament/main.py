@@ -103,8 +103,12 @@ def main():
             grid = load_grid_from_input()
 
         results = search.find_words(grid, word_list)
-        results = [x + (compute_score(x[0]),) for x in results]
-        results.sort(key=lambda x: x[-1] / float(len(x)), reverse=True)
+        results = [{
+            'word': x[0],
+            'score': compute_score(x[0]),
+            'snake': x[1]
+        } for x in results]
+        results.sort(key=lambda x: x['score'] / float(len(x['word'])), reverse=True)
 
         draw.draw_results(results)
     else:

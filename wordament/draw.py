@@ -25,7 +25,7 @@ def draw_results(results, stop_signal=None):
 
     def _draw_word(word):
         print word
-        for letter in word[1]:
+        for letter in word['snake']:
             if stop_signal and stop_signal.isSet():
                 return
             _move_to_pos(letter, cur_pos, driver)
@@ -38,13 +38,13 @@ def draw_results(results, stop_signal=None):
         while results:
             result = results[0]
 
-            interim_word = _find_interim_word(cur_pos, result[1][0], results[1:])
+            interim_word = _find_interim_word(cur_pos, result['snake'][0], results[1:])
             if interim_word:
                 _draw_word(interim_word)
 
             _draw_word(result)
 
-            total += result[-1]
+            total += result['score']
             print 'Running total: %i' % total
 
     finally:
@@ -61,7 +61,7 @@ def _find_interim_word(cur_pos, target_pos, words):
     base_dist = _calc_dist(cur_pos, target_pos)
 
     for word in words:
-        if base_dist > _calc_dist(cur_pos, word[1][0]) + _calc_dist(word[1][-1], target_pos):
+        if base_dist > _calc_dist(cur_pos, word['snake'][0]) + _calc_dist(word['snake'][-1], target_pos):
             print 'interim:', word
             return word
 
