@@ -16,7 +16,7 @@ def draw_results(results, stop_signal=None):
         motor.MotorDef(_X_MOTOR_PINS, 'y', 1, True),
         motor.MotorDef(_Y_MOTOR_PINS, 'x', 2)
     ]
-    driver = motor.AdaMotorDriver(motors)
+    driver = motor.GpioMotorDriver(motors)
     touch_servo = servo.Servo(_SERVO_PIN)
     touch_servo.move_up()
 
