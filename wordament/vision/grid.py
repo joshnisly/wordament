@@ -2,7 +2,10 @@
 
 import cv2
 import numpy as np
-import tesseract
+try:
+    import tesseract
+except ImportError:
+    print 'Skipping tesseract...'
 
 import search
 import vision.squares
