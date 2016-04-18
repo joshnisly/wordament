@@ -13,7 +13,6 @@ import search
 import vision.grid
 
 LETTERS = 'abcdefghijklmnopqrstuvwxyz'
-#SCORES = [2533154420634224 222466 58]
 SCORES = [2, 5, 3, 3, 1, 5, 4, 4, 2, 10, 6, 3, 4, 2, 2, 4, 2, 2, 2, 2, 4, 6, 6, 9, 5, 8]
 LETTER_SCORES = dict(zip(LETTERS, SCORES))
 
