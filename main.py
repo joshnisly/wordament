@@ -25,7 +25,7 @@ def compute_score(word):
         return int(total * 2)
     if len(word) >= 5:
         return int(total * 1.5)
-    return total / float(len(word))
+    return total
 
 
 def load_grid_from_input():
@@ -103,7 +103,8 @@ def main():
             grid = load_grid_from_input()
 
         results = search.find_words(grid, word_list)
-        results.sort(key=lambda x: compute_score(x[0]), reverse=True)
+        results = [x + (compute_score(x[0]),) for x in results]
+        results.sort(key=lambda x: x[-1] / float(len(x)), reverse=True)
 
         draw.draw_results(results)
     else:

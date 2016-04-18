@@ -34,6 +34,7 @@ def draw_results(results, stop_signal=None):
         results.remove(word)
 
     try:
+        total = 0
         while results:
             result = results[0]
 
@@ -42,6 +43,9 @@ def draw_results(results, stop_signal=None):
                 _draw_word(interim_word)
 
             _draw_word(result)
+
+            total += result[-1]
+            print 'Running total: %i' % total
 
     finally:
         touch_servo.move_up()
