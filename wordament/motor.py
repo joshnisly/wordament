@@ -64,6 +64,7 @@ class AdaMotorDriver(object):
         steps = int(movement.squares * self._STEPS_PER_SQUARE)
         motor.step(steps, dir, Adafruit_MotorHAT.SINGLE)
 
+
 class GpioMotorDriver(object):
     _SLEEP_INTERVAL = 7 / 1000.0
     _STEPS_PER_SQUARE = 11
