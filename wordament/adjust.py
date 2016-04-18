@@ -8,21 +8,35 @@ def adjust():
         motor.MotorDef(draw._X_MOTOR_PINS, 'x', 1, True),
         motor.MotorDef(draw._Y_MOTOR_PINS, 'y', 2)
     ]
-    driver = motor.AdaMotorDriver(motors)
+    driver = motor.GpioMotorDriver(motors)
     last = None
     STEP_SIZE = 1
     while True:
         choice = raw_input('Enter lrupq:') or last
-        if choice == 'l':
-            driver.move([motor.MotorMovement('x', True, STEP_SIZE)])
-        elif choice == 'r':
-            driver.move([motor.MotorMovement('x', False, STEP_SIZE)])
-        elif choice == 'u':
-            driver.move([motor.MotorMovement('y', True, STEP_SIZE)])
-        elif choice == 'd':
-            driver.move([motor.MotorMovement('y', False, STEP_SIZE)])
-        elif choice == 'q':
+        movements = []
+        if 'l' in choice:
+            movements.append(motor.MotorMovement('x', True, STEP_SIZE))
+        if 'r' in choice:
+            movements.append(motor.MotorMovement('x', False, STEP_SIZE))
+        if 'u' in choice:
+            movements.append(motor.MotorMovement('y', True, STEP_SIZE))
+        if 'd' in choice:
+            movements.append(motor.MotorMovement('y', False, STEP_SIZE))
+        if 'x' in choice:
+            driver.move([
+                motor.MotorMovement('x', False, STEP_SIZE),
+            ])
+            driver.move([
+                motor.MotorMovement('y', True, STEP_SIZE)
+            ])
+            driver.move([
+                motor.MotorMovement('x', True, STEP_SIZE),
+                motor.MotorMovement('y', False, STEP_SIZE)
+            ])
+        if 'q' in choice:
             return
+
+        driver.move(movements)
 
         last = choice
 
