@@ -10,8 +10,6 @@ except ImportError:
 import threading
 import time
 
-_SLEEP_INTERVAL = 2.5 / 1000.0
-
 
 class MotorDef(object):
     def __init__(self, pins, motor_id, ada_id, auto_reverse=False):
@@ -46,6 +44,7 @@ class AdaMotorDriver(object):
         for motor in self._motors.values():
             print 'exiting for', motor.ada_id
             self._hat.getMotor(motor.ada_id).run(Adafruit_MotorHAT.RELEASE)
+            time.sleep(0.01)
 
     def move(self, movements):
         if FAKE_MOTORS:
@@ -66,7 +65,9 @@ class AdaMotorDriver(object):
         motor.step(steps, dir, Adafruit_MotorHAT.SINGLE)
 
 class GpioMotorDriver(object):
-    _STEPS_PER_SQUARE = 111
+    _SLEEP_INTERVAL = 7 / 1000.0
+    _STEPS_PER_SQUARE = 11
+
     def __init__(self, motors):
         if FAKE_MOTORS:
             return
@@ -97,7 +98,7 @@ class GpioMotorDriver(object):
             thread.join()
 
     def _move(self, movement):
-        time.sleep(_SLEEP_INTERVAL)
+        time.sleep(self._SLEEP_INTERVAL)
         pins = self._motors[movement.motor_id].pins
         steps = int(movement.squares * self._STEPS_PER_SQUARE)
         reverse = self._motors[movement.motor_id].auto_reverse != movement.reverse
@@ -107,24 +108,31 @@ class GpioMotorDriver(object):
             for pin_set in pin_vals:
                 for pin, val in pin_set:
                     GPIO.output(pin, val != 0)
-                time.sleep(_SLEEP_INTERVAL)
+                time.sleep(self._SLEEP_INTERVAL)
 
-    _movement_sequence = [
+    _unipolar_movement_sequence = [
         [1, 0, 0, 1],
         [1, 1, 0, 0],
         [0, 1, 1, 0],
         [0, 0, 1, 1],
     ]
 
+    _movement_sequence = [
+        [1, 0, 1, 0],
+        [0, 1, 1, 0],
+        [0, 1, 0, 1],
+        [1, 0, 0, 1],
+    ]
+
 
 def test():
     _X_MOTOR_PINS = [17, 18, 21, 22]
     _Y_MOTOR_PINS = [23, 24, 25, 27]
-    x_motor = MotorDef(_X_MOTOR_PINS, 'x')
-    y_motor = MotorDef(_Y_MOTOR_PINS, 'y')
-    driver = MotorDriver([x_motor, y_motor])
-    driver.move([MotorMovement('y', True, 4), MotorMovement('x', True, 4)])
-    driver.move([MotorMovement('y', False, 4), MotorMovement('x', False, 4)])
+    x_motor = MotorDef(_X_MOTOR_PINS, 'x', 0)
+    y_motor = MotorDef(_Y_MOTOR_PINS, 'y', 0)
+    driver = GpioMotorDriver([x_motor, y_motor])
+    driver.move([MotorMovement('y', True, 1), MotorMovement('x', True, 1)])
+    driver.move([MotorMovement('y', False, 1), MotorMovement('x', False, 1)])
 
 
 if __name__ == '__main__':
