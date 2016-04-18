@@ -15,13 +15,11 @@ class Servo(object):
 
     def move_up(self):
         if not self._is_up:
-            print 'move up'
             self._write_pos(_UP_POS)
             self._is_up = True
 
     def move_down(self):
         if self._is_up:
-            print 'move down'
             self._write_pos(_DOWN_POS)
             self._is_up = False
 
