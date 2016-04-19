@@ -9,7 +9,14 @@ GRID_SIZE = 4
 
 
 def load_from_string(letters):
-    return [letters[x*GRID_SIZE:(x+1)*GRID_SIZE] for x in range(0, GRID_SIZE)]
+    list_letters = []
+    for letter in letters:
+        if letter.isupper() and list_letters and list_letters[-1].isupper():
+            list_letters[-1] += letter
+        else:
+            list_letters.append(letter)
+    list_letters = [x.lower() for x in list_letters]
+    return [list_letters[x*GRID_SIZE:(x+1)*GRID_SIZE] for x in range(0, GRID_SIZE)]
 
 
 def load_list_from_file(path):
