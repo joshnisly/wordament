@@ -39,11 +39,11 @@ def draw_results(results, stop_signal=None):
 
             interim_word = _find_interim_word(cur_pos, result['snake'][0], results[1:])
             if interim_word:
-                print 'i:', _result_display(interim_word)
+                print _result_display(interim_word, True)
                 _draw_word(interim_word)
                 total += interim_word['score']
 
-            print _result_display(result)
+            print _result_display(result, False)
             _draw_word(result)
 
             total += result['score']
@@ -82,8 +82,13 @@ def _add_movement(old, new, motor_id, movements):
         movements.append(motor.MotorMovement(motor_id, old > new, abs(old-new)))
 
 
-def _result_display(result):
-    return '%s: %i (len: %i)' % (result['word'], result['score'], len(result['word']))
+def _result_display(result, is_interim):
+    return '%s: %i (len: %i) %s' % (
+        result['word'],
+        result['score'],
+        len(result['word']),
+        '(interim)' if is_interim else ''
+    )
 
 
 class InterimWordTest(unittest.TestCase):
