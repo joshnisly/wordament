@@ -7,6 +7,21 @@ import binsearch
 
 GRID_SIZE = 4
 
+LETTERS = 'abcdefghijklmnopqrstuvwxyz'
+SCORES = [2, 5, 3, 3, 1, 5, 4, 4, 2, 10, 6, 3, 4, 2, 2, 4, 2, 2, 2, 2, 4, 6, 6, 9, 5, 8]
+LETTER_SCORES = dict(zip(LETTERS, SCORES))
+
+
+def compute_score(word):
+    total = sum([LETTER_SCORES[x] for x in word])
+    if len(word) >= 8:
+        return int(total * 2.5)
+    if len(word) >= 6:
+        return int(total * 2)
+    if len(word) >= 5:
+        return int(total * 1.5)
+    return total
+
 
 def load_from_string(letters):
     list_letters = []
@@ -24,6 +39,19 @@ def load_list_from_file(path):
 
 
 def find_words(grid, word_list):
+    results = _find_words(grid, word_list)
+
+    results = [{
+        'word': x[0],
+        'score': compute_score(x[0]),
+        'snake': x[1]
+    } for x in results]
+
+    results.sort(key=lambda x: x['score'] / float(len(x['word'])), reverse=True)
+    return results
+
+
+def _find_words(grid, word_list):
     _validate_size(grid)
 
     results = []

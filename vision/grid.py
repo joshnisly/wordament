@@ -100,36 +100,8 @@ def draw_letters_at_squares(image, text, square_rows):
     return scratch
 
 
-def _trash():
-    for row_index, row in enumerate(square_rows):
-        for col_index, square in enumerate(row):
-            _print_text(vis, square, '%i:%i' % (row_index, col_index))
-
-    cv2.imshow('squares', vis)
-
-
-    shrunk_grid_squares = [_shrink_square(x, 3, 20) for x in deskewed_grid_squares]
-    cv2.drawContours(deskewed, shrunk_grid_squares, -1, (0, 0, 255), 3)
-    cv2.imshow('deskewed squares', deskewed)
-
-    thresholded = cv2.threshold(deskewed, 160, 250, cv2.THRESH_BINARY_INV)[1]
-
-    cv2.imshow('threshold', thresholded)
-
-    text = ''
-    deskewed_square_rows = _arrange_in_grid(deskewed_grid_squares)
-    for row in deskewed_square_rows:
-        for square in row:
-            square_text, confidence = _ocr(_crop_to_rect(thresholded, square))
-            square_text = square_text or 'I'
-            cv2.imshow('cropped', _crop_to_rect(thresholded, square))
-            print square_text, confidence
-
-            text += square_text
-    print text.lower()
-
-
 def _ocr(image):
+    return 'I', 50
     api = tesseract.TessBaseAPI()
     api.Init('/usr/share/tesseract-ocr', 'eng', tesseract.OEM_DEFAULT)
     api.SetVariable('tessedit_char_whitelist', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ/')
@@ -143,7 +115,7 @@ def _ocr(image):
 
 def _arrange_in_grid(grid_squares):
     grid_squares.sort(key=lambda x: vision.squares.square_min_max(x, 1))
-    square_rows = search.load_from_string(grid_squares)
+    square_rows = [grid_squares[x*search.GRID_SIZE:(x+1)*search.GRID_SIZE] for x in range(0, search.GRID_SIZE)]
     for row in square_rows:
         row.sort(key=lambda x: vision.squares.square_min_max(x, 0))
     return square_rows

@@ -12,21 +12,6 @@ import driver_thread
 import search
 import vision.grid
 
-LETTERS = 'abcdefghijklmnopqrstuvwxyz'
-SCORES = [2, 5, 3, 3, 1, 5, 4, 4, 2, 10, 6, 3, 4, 2, 2, 4, 2, 2, 2, 2, 4, 6, 6, 9, 5, 8]
-LETTER_SCORES = dict(zip(LETTERS, SCORES))
-
-
-def compute_score(word):
-    total = sum([LETTER_SCORES[x] for x in word])
-    if len(word) >= 8:
-        return int(total * 2.5)
-    if len(word) >= 6:
-        return int(total * 2)
-    if len(word) >= 5:
-        return int(total * 1.5)
-    return total
-
 
 def load_grid_from_input():
     '''
@@ -56,6 +41,9 @@ class _LockedItem(object):
 
             time.sleep(0.01)
 
+    def get_nowait(self):
+        return self._try_get()
+
     def _try_get(self):
         self._lock.acquire()
         item = None
@@ -76,12 +64,14 @@ class _DisplayThread(threading.Thread):
     def run(self):
         import cv2
         while True:
-            image_data = self._image_data_src.get()
+            image_data = self._image_data_src.get_nowait()
             image = self._image_src.get()
-            image = vision.grid.warp_image_to_squares(image, image_data['orig_squares'])
-            image = vision.grid.draw_squares(image, image_data['warped_squares'])
-            image = vision.grid.draw_letters_at_squares(image, image_data['text'], image_data['warped_squares'])
-            cv2.imshow('result', image)
+            cv2.imshow('source', image)
+            if image_data:
+                image = vision.grid.warp_image_to_squares(image, image_data['orig_squares'])
+                image = vision.grid.draw_squares(image, image_data['warped_squares'])
+                image = vision.grid.draw_letters_at_squares(image, image_data['text'], image_data['warped_squares'])
+                cv2.imshow('result', image)
             cv2.waitKey(100)
 
 
@@ -102,12 +92,6 @@ def main():
             grid = load_grid_from_input()
 
         results = search.find_words(grid, word_list)
-        results = [{
-            'word': x[0],
-            'score': compute_score(x[0]),
-            'snake': x[1]
-        } for x in results]
-        results.sort(key=lambda x: x['score'] / float(len(x['word'])), reverse=True)
 
         draw.draw_results(results)
     else:
