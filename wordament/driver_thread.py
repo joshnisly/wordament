@@ -41,7 +41,6 @@ class DriverThread(threading.Thread):
             # Find words
             grid = search.load_from_string(self._text)
             results = search.find_words(grid, self._word_list)
-            results.sort(key=lambda x: len(x[1]), reverse=True)
 
             # Draw words
             draw.draw_results(results, self._break_signal)
