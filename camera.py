@@ -28,8 +28,10 @@ class CameraThread(threading.Thread):
                 image = camera.read()[1]
             else:
                 image = self._load_jpg_img()
-            image = vision.grid.find_and_rotate_image(image)
-            self._image_sink.set(image)
+
+            if image is not None:
+                image = vision.grid.find_and_rotate_image(image)
+                self._image_sink.set(image)
             time.sleep(0.1)
 
     @staticmethod
