@@ -37,6 +37,8 @@ def load_from_string(letters):
 def load_list_from_file(path):
     return [x.strip().lower() for x in open(path).readlines()]
 
+def _calc_dist(a, b):
+        return max(abs(a[0] - b[0]), abs(a[1] - b[1]))
 
 def find_words(grid, word_list):
     results = _find_words(grid, word_list)
@@ -47,8 +49,34 @@ def find_words(grid, word_list):
         'snake': x[1]
     } for x in results]
 
+    #results.sort(key=lambda x: x['score'] / float(len(x['word'])), reverse=True)
+
     results.sort(key=lambda x: x['score'] / float(len(x['word'])), reverse=True)
-    return results
+    ordered_results = []
+    ordered_results.append(results[0])
+    last_snake = results[0]['snake'][-1]
+    results.pop(0)
+
+    while len(results) > 0:
+        best_distance = 1000
+        best_score = -1
+        best_index = -1
+        best_last_snake = (-1, -1)
+
+        for index, result in enumerate(results):
+            dist = _calc_dist(result['snake'][0], last_snake)
+            score = result['score'] / float(len(result['word']))
+            if dist < best_distance or (dist == best_distance and score > best_score):
+                best_distance = dist
+                best_score = score
+                best_index = index
+                best_last_snake = result['snake'][-1]
+        
+        ordered_results.append(results[best_index])
+        last_snake = best_last_snake
+        results.pop(best_index)
+
+    return ordered_results
 
 
 def _find_words(grid, word_list):
@@ -161,6 +189,14 @@ def _get_all_grid_points():
 
 
 class FixesTest(unittest.TestCase):
+    def testFile(self):
+        with open("wordlist.txt") as f:
+            content = f.readlines()
+        content = [x.strip() for x in content] 
+        results = find_words(load_from_string('niadvsmeeirsacuq'), content) 
+        #results.sort(key=lambda s: s["score"], reverse=True)
+        self.assertEquals(1, 1)
+
     def testWordDerived(self):
         matches = self._find('hncrtienvrdahede', ['derived'])
         self.assertEquals(matches, ['derived'])
@@ -171,8 +207,7 @@ class FixesTest(unittest.TestCase):
 
     def _find(self, letters, words):
         results = find_words(load_from_string(letters), words)
-        return [x[0] for x in results]
-
+        return [x["word"] for x in results]
 
 if __name__ == '__main__':
     unittest.main()
