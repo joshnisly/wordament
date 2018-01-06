@@ -1,25 +1,29 @@
 #!/usr/bin/python
 
+import flask
+import json
 import sys
-
-import swat
 
 import search
 
 
-def index(request, initial=''):
-    return swat.template_response(request, 'index.html', {
+app = flask.Flask(__name__)
+
+
+@app.route('/')
+def index(initial=''):
+    return flask.render_template('index.html', **{
         'grid_size': search.GRID_SIZE,
         'initial_grid': initial
     })
 
 
-@swat.json_request
-def solve(request):
-    grid = search.load_from_string(request.JSON['board'])
+@app.route('/solve/', methods=['POST'])
+def solve():
+    grid = search.load_from_string(flask.request.form['board'])
     results = search.find_words(grid, WORD_LIST)
-    results.sort(key=lambda x: len(x[0]), reverse=True)
-    return results
+    results.sort(key=lambda x: len(x['word']), reverse=True)
+    return json.dumps(results)
 
 
 URLS = (
@@ -29,8 +33,6 @@ URLS = (
 
 WORD_LIST = None
 
-application = swat.Application(URLS, send_500_emails=False)
-
 if __name__ == '__main__':
     WORD_LIST = sorted(search.load_list_from_file(sys.argv[1]))
-    swat.run_standalone(application, 'localhost:8081', should_reload=True)
+    app.run(host='localhost', port=8081, debug=True)
