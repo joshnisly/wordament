@@ -1,6 +1,9 @@
 #!/usr/bin/python
 
-import cv2
+try:
+    import cv2
+except ImportError:
+    print 'Skipping OpenCV...'
 import os
 import threading
 import time
