@@ -37,7 +37,7 @@ Board.prototype.drawWord = function(word)
         this._parentElem[0].offsetTop
     ];
 
-    var coords = word[1];
+    var coords = word['snake'];
     var lastCenter = null;
     for (var i = 0; i < coords.length; i++)
     {
@@ -105,7 +105,7 @@ function displayResults(results, board)
     var parentElem = $('#ResultsSection');
     for (var i = 0; i < results.length; i++)
     {
-        var child = parentElem.appendNewChild('DIV', '', 'Result').text(results[i][0]);
+        var child = parentElem.appendNewChild('DIV', '', 'Result').text(results[i]['word']);
         child[0].xresult = results[i];
         function selectWord(event)
         {
@@ -118,13 +118,13 @@ function displayResults(results, board)
 
 function solve(letters, board)
 {
-    doAjax({
+    $.ajax({
         url: '/solve/',
         method: 'POST',
         data: {
             'board': letters
         },
-        success: function(data) { displayResults(data, board); }
+        success: function(data) { displayResults(window.JSON.parse(data), board); }
     });
 }
 
